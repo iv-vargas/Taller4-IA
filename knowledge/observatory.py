@@ -32,6 +32,35 @@ def build_rules():
       objetos Atom como premisas y un Atom como conclusión. La tupla representa
       la conjunción; las variables de la regla se interpretan universalmente.
     """
-    # TODO: Add your code here
-    raise NotImplementedError
-    # FIN DEL BLOQUE DEL ESTUDIANTE
+    #Versión original propia. Se revisó con ayuda de una IA pero se determinó que no era necesario ningún cambio.
+    #R1:
+    premisas = (atom("Asignado", "?t", "?p"), atom("Requiere", "?t", "?e"), atom("Habilitado", "?p", "?e"))
+    conclusion = atom("Competente", "?p", "?t")
+    descripcion = "Un técnico es competente para una tarea si está asignado a ella, la tarea requiere una especialidad y él está habilitado en esa especialidad."
+    R1 = Rule("R1", descripcion, premisas, conclusion)
+    
+    #R2:
+    premisas = (atom("EnZona", "?t", "?z"), atom("AislamientoConfirmado", "?z", "?f"), atom("SinAlertaConfirmada", "?z", "?f"))
+    conclusion = atom("Preparada", "?t", "?f")
+    descripcion = "Una tarea está preparada en una franja si su zona tiene aislamiento confirmado y ausencia de alerta confirmada para esa misma franja."
+    R2 = Rule("R2", descripcion, premisas, conclusion)
+    
+    #R3:
+    premisas = (atom("Programada", "?t", "?f"), atom("Asignado", "?t", "?p"), atom("Disponible", "?p", "?f"), atom("Competente", "?p", "?t"), atom("Preparada", "?t", "?f"))
+    conclusion = atom("Autorizada", "?t", "?f")
+    descripcion = "Una tarea se autoriza si está programada en esa franja, su técnico asignado está disponible y es competente para ella, y la tarea está preparada."
+    R3 = Rule("R3", descripcion, premisas, conclusion)
+    
+    #R4:
+    premisas = (atom("Programada", "?t", "?f"), atom("EnZona", "?t", "?z"), atom("Alerta", "?z", "?f"))
+    conclusion = atom("Bloqueada", "?t", "?f")
+    descripcion = "Una tarea programada se bloquea si su zona tiene una alerta en esa franja."
+    R4 = Rule("R4", descripcion, premisas, conclusion)
+    
+    #R5:
+    premisas = (atom("Programada", "?t", "?f"), atom("EnZona", "?t", "?z"), atom("AislamientoFallido", "?z", "?f"))
+    conclusion = atom("Bloqueada", "?t", "?f")
+    descripcion = "Una tarea programada se bloquea si el aislamiento de su zona falló en esa franja."
+    R5 = Rule("R5", descripcion, premisas, conclusion) 
+    
+    return (R1, R2, R3, R4, R5)
