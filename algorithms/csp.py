@@ -60,9 +60,43 @@ def backtracking_search(csp, domains=None, select_variable=None,
                 trace.restore(parent, snapshot(parent), variable)
         return result
 
-    # TODO: Add your code here
-    raise NotImplementedError
-    # FIN DEL BLOQUE DEL ESTUDIANTE
+    """
+    Primera Version:
+    
+    def expand(assignment):
+          while choose is not None:
+            choose_values = ordered(csp, choose, assignment, domains)
+            for i in choose_values:
+              if consistent(choose, i, assignment):
+                return search(assignment)
+            return  {choose:None}  
+       
+    Errores:
+            
+    1. La verison original del codigo trataba choose como una variable y no como un metodo.
+    2. El codigo revisaba consistencia y luego retrona search de la primera asignacion consistente. En realidad se ejecuta search 
+    y si no se encuentra un valor se prueba con otro consistente hasta que ya no hayan mas.
+    3. El valor de retorno debe ser None y no un diccionario
+    4. No tome en consideracion el caso en el que ya todas las variables son asignadas (caso base)
+    
+    Reflexion:
+    La IAG me clarifico como usar el metodo choose (puesto que pense que era una variable).
+    Ademas, considero que lo mas importante fue que me ayudo a formalizar la intuicion que se deben 
+    probar varios valores consistentes hasta encontrar uno que logre satisfacer todo el csp.
+    """
+    
+    def expand(assignment):
+        if len(assignment) == len(csp.variables):
+            return assignment
+
+        x = choose(csp, assignment, domains)            
+        for value in ordered(csp, x, assignment, domains):
+            if consistent(x, value, assignment):
+                result = search({**assignment, x: value})   
+                if result is not None:
+                    return result                       
+        return None                                     
+
 
     return search({})
 
