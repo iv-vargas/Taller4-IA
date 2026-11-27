@@ -171,10 +171,7 @@ def select_unassigned_variable(csp, assignment, domains):
     por numero de vecinos y orden.
     
     """
-    
-    
 
-  
     selected_variable = None
     selected_remaining = None
     selected_degree = None
@@ -218,7 +215,66 @@ def order_domain_values(csp, variable, assignment, domains):
       csp.consistent(x, valor, assignment).
     - csp.compatible(variable, valor, vecino, valor_vecino) comprueba cada par
       sin modificar los dominios.
+      
+      
+    Version Inicial: 
+    
+     ordered_lcv = []
+        lcv_dict = {}
+        
+        for valor in domains[variable]:
+          if csp.consistent(variable, valor, assignment):
+            compatible =0
+            for n in csp.neighbors[x]:
+              for vn in domains[n]:
+                if csp.compatible(variable, valor, n, vn):
+                  compatible += 1
+            lcv_dict[valor] = compatible
+            
+          if len(ordered_lcv) == 0:
+            ordered_lcv.append(valor)
+          elif len(ordered_lcv) == 0 and compatible > lcv_dict[ordered_lcv[0]]:
+            ordered_lcv.append(valor)
+          else:
+              insert = False
+              i = 0
+              while not insert and i < len(ordered_lcv):
+                if compatible < lcv_dict[ordered_lcv[i]] or compatible > lcv_dict[ordered_lcv[i+1]] :
+                  ordered_lcv.insert(i,valor)
+                  
+        return ordered_lcv
+    
+    Errores:
+    1. El codigo revisa tanto vecinos asignados como no asignados
+    2. No se diferencia entre valores validos e invalidos del vecino
+    3. La cuenta de compatibles esta al reves, deberia contar por valores no compatibles
+    
+    
+    Correcciones:
+    Ahora se verifican vecinos no asignado y valores validos ademas de ordenar por los valores que descartan menos valores de los vecinos.
+    La IA implemento sorted(...lambda...) que hace mas simple la insercion en orden
     """
-    # TODO: Add your code here
-    raise NotImplementedError
-    # FIN DEL BLOQUE DEL ESTUDIANTE
+    
+    
+   
+  
+    candidates = []
+    eliminated = {}
+
+    for value in domains[variable]:
+        if not csp.consistent(variable, value, assignment):
+            continue                              # solo candidatos compatibles
+
+        count = 0
+        for n in csp.neighbors[variable]:
+            if n in assignment:
+                continue                          
+            for vn in domains[n]:
+                if (csp.consistent(n, vn, assignment)          
+                        and not csp.compatible(variable, value, n, vn)):  
+                    count += 1
+
+        candidates.append(value)
+        eliminated[value] = count
+
+    return sorted(candidates, key=lambda v: eliminated[v])
