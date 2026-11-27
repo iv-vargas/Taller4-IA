@@ -140,10 +140,70 @@ def select_unassigned_variable(csp, assignment, domains):
       compatible con la asignación parcial. Los dominios deben conservarse.
     - csp.neighbors[x] contiene sus vecinos; csp.variables conserva el orden
       original para los desempates.
+      
+      
+    Version Inicial:
+    
+    selected_variable = None
+        selected_neighbors = 0
+        for i in csp.variables:
+          if i not in assignment.keys():
+            curr_neighbors = 0
+            for n in csp.neighbors[i]:
+              if csp.consistent(i, n, assignment):
+                curr_neighbors += 1
+            if selected_neighbors < curr_neighbors:
+              selected_variable = i
+              selected_neighbors = curr_neighbors
+          
+        
+        return {selected_variable:selected_neighbors}
+        
+    Correccion IAG:
+    
+    Errores:
+    1. El algoritmo inicial tenia como criterio principal cual variable tenia mayor numero de vecinos.
+    2. Pase como parametro valor en csp.consistent un vecino y no un valor del domino de la variable
+    3. El formato de retorno es incorrecto
+    
+    Correccion:
+    MRV verifica primero cual variable tiene un dominio (con valores consistentes) mas grande y luego desempata
+    por numero de vecinos y orden.
+    
     """
-    # TODO: Add your code here
-    raise NotImplementedError
-    # FIN DEL BLOQUE DEL ESTUDIANTE
+    
+    
+
+  
+    selected_variable = None
+    selected_remaining = None
+    selected_degree = None
+
+    for x in csp.variables:
+        if x in assignment:
+            continue                   
+
+        remaining = 0
+        for value in domains[x]:
+            if csp.consistent(x, value, assignment):
+                remaining += 1
+
+        degree = 0
+        for n in csp.neighbors[x]:
+            if n not in assignment:
+                degree += 1
+
+        if (selected_variable is None
+                or remaining < selected_remaining
+                or (remaining == selected_remaining and degree > selected_degree)):
+            selected_variable = x
+            selected_remaining = remaining
+            selected_degree = degree
+
+    return selected_variable
+      
+    
+    
 
 
 def order_domain_values(csp, variable, assignment, domains):
