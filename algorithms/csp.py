@@ -111,11 +111,45 @@ def revise(csp, x, y, domains):
     - csp.compatible(x, valor_x, y, valor_y) comprueba las restricciones
       entre ese par de tareas, respetando la dirección de las precedencias.
     - Si elimina elementos mientras recorre una lista, itere sobre una copia.
+    
+    
+    USO DE IA:
+    
+    
+    Versión inicial:
+    
+    copia_dominios = copy_domains(domains)
+  
+    revised = False
+    
+    for x_val in copia_dominios[x]:
+      if (not csp.compatible(x, x_val, y, y_val) for y_val in copia_dominios[y]):
+        domains[x].remove(x_val)
+        revised = True
+        
+    return revised
+    
+    Ocurría un bug en este caso porque el if estaría evaluando un objeto que siempre es verdadero, por
+    lo que la revisión no estaría funcionando correctamente. Además, no estaba haciendo uso de any() para 
+    evaluar un condicional sobre un iterable. 
+    
+    Por ello se solicitó ayuda de Copilot para revisar esta función y ver qué estaba mal, a lo que retornó
+    que era necesario el uso de la función any() porque de lo contrario no iba a funcionar correctamente, además,
+    estaba haciendo un mal uso de los paréntesis en el condicional.
     """
     # TODO: Add your code here
-    raise NotImplementedError
-    # FIN DEL BLOQUE DEL ESTUDIANTE
-
+    
+    
+    copia_dominios = copy_domains(domains)
+  
+    revised = False
+    
+    for x_val in copia_dominios[x]:
+      if not any(csp.compatible(x, x_val, y, y_val) for y_val in copia_dominios[y]):
+        domains[x].remove(x_val)
+        revised = True
+        
+    return revised
 
 def ac3(csp, domains):
     """Punto 2: reduce domains; retorna False si detecta un dominio vacío.
@@ -128,8 +162,19 @@ def ac3(csp, domains):
     - revise(csp, x, y, domains) retorna si modificó domains[x].
     """
     # TODO: Add your code here
-    raise NotImplementedError
-    # FIN DEL BLOQUE DEL ESTUDIANTE
+    
+    cola = [(x, y) for x in csp.variables for y in csp.neighbors[x]]
+    
+    while cola:
+      (x, y) = cola.pop(0)
+      if revise(csp, x, y, domains):
+        if len(domains[x])== 0 or not domains[x]:
+          return False
+        for x_k in csp.neighbors[x]:
+          if x_k != y:
+            cola.append((x_k, x))
+    
+    return True
 
 
 def select_unassigned_variable(csp, assignment, domains):
