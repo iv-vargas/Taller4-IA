@@ -14,6 +14,10 @@ def select_action(facts, task, slot):
     Tips:
     - atom('Bloqueada', task, slot) construye el hecho que puede buscar en facts.
     """
-    # TODO: Add your code here
-    raise NotImplementedError
+    if atom('Bloqueada',task,slot) in facts:
+        return "suspender"
+    elif atom('Autorizada',task,slot) in facts:
+        return "autorizar"
+    else:
+        return 'solicitar_verificacion'
     # FIN DEL BLOQUE DEL ESTUDIANTE
